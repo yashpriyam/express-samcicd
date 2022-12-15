@@ -47,5 +47,10 @@ exports.handler = async (event, context) => {
 
 
 app.get('/hell', (req, res) => res.send('Hello World'))
+app.get('/Mmovies',  async(req, res) => {
+    const movies = await db.collection("movies").find({}).limit(20).toArray();
+    res.json({success:true, movies})
+})
+
 app.listen(3000, () => console.log('Running on port 3000'))
 module.exports.handler = serverless(app)
