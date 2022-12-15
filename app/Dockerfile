@@ -7,4 +7,4 @@ RUN npm install
 # RUN npm ci --production
 
 # Command can be overwritten by providing a different command in the template directly.
-CMD ["app.lambdaHandler"]
+CMD ["app.handler"]
