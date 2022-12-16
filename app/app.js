@@ -27,12 +27,15 @@ connectDB();
 const app = express()
 
 // middlewares
-app.options('*', cors({
-    origin: "https://master.d3l7aw6q5p47co.amplifyapp.com/"
-}))
-// app.use(cors({
-//     origin: "https://master.d3l7aw6q5p47co.amplifyapp.com/"
+// app.options('*', cors({
+//     origin: "https://master.d3l7aw6q5p47co.amplifyapp.com/",
+//     allowedHeaders: [
+//         'Access-Control-Allow-Origin', '*'
+//     ]
 // }))
+app.use(cors({
+    origin: "*"
+}))
 
 
 // todo routes
