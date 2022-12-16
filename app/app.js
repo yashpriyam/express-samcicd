@@ -2,55 +2,67 @@ const express = require('express')
 const serverless = require('serverless-http')
 const app = express()
 // Import the MongoDB driver
-const MongoClient = require("mongodb").MongoClient;
-
+const mongoose = require('mongoose')
 // Define our connection string. Info on where to get this will be described below. In a real world application you'd want to get this string from a key vault like AWS Key Management, but for brevity, we'll hardcode it in our serverless function here.
 const MONGODB_URI =
   "mongodb+srv://yash:yash12345@cluster0.firlmgw.mongodb.net/?retryWrites=true&w=majority";
+const Todo = require('./model/todo')
 
-// Once we connect to the database once, we'll store that connection and reuse it so that we don't have to connect to the database on every request.
-let cachedDb = null;
-
-async function connectToDatabase() {
-  if (cachedDb) {
-    return cachedDb;
-  }
-
-  // Connect to our MongoDB database hosted on MongoDB Atlas
-  const client = await MongoClient.connect(MONGODB_URI);
-
-  // Specify which database we want to use
-  const db = await client.db("sample_mflix");
-
-  cachedDb = db;
-  return db;
+async function connectDB() {
+  const client = await mongoose.connect(`${MONGODB_URI}`, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  });
+  // dbConnector = client.connections[0].db;
+  // await addCsvDataToMongoAsJson(dbConnector);
 }
-
-exports.handler = async (event, context) => {
-
-  /* By default, the callback waits until the runtime event loop is empty before freezing the process and returning the results to the caller. Setting this property to false requests that AWS Lambda freeze the process soon after the callback is invoked, even if there are events in the event loop. AWS Lambda will freeze the process, any state data, and the events in the event loop. Any remaining events in the event loop are processed when the Lambda function is next invoked, if AWS Lambda chooses to use the frozen process. */
-  context.callbackWaitsForEmptyEventLoop = false;
-
-  // Get an instance of our database
-  const db = await connectToDatabase();
-
-  // Make a MongoDB MQL Query to go into the movies collection and return the first 20 movies.
-  const movies = await db.collection("movies").find({}).limit(20).toArray();
-
-  const response = {
-    statusCode: 200,
-    body: JSON.stringify(movies),
-  };
-
-  return response;
-};
+connectDB();
 
 
 app.get('/hell', (req, res) => res.send('Hello World'))
-app.get('/Mmovies',  async(req, res) => {
-    const movies = await db.collection("movies").find({}).limit(20).toArray();
-    res.json({success:true, movies})
+app.post("/create", async (req, res) => {
+    const todo = req.body.title;
+    try {
+      const todoData = await Todos.create({ title: todo });
+      return res.status(200).send(JSON.stringify(todoData));
+    } catch (error) {
+      console.log(error.message);
+      res.status(404).send({ error: error.message });
+    }
+  });
+  app.post("/update/:id", async (req, res) => {
+    const id = req.params.id;
+    try {
+      const todoData = await Todos.findOne({ _id: id });
+      const todoCompleted = todoData.completed ? false : true;
+      const updateTodo = await Todos.updateOne(
+        { _id: id },
+        {
+          $set: {
+            completed: todoCompleted,
+          },
+        }
+      );
+      return res.status(200).send(JSON.stringify(updateTodo));
+    } catch (error) {
+      console.log(error.message);
+      res.status(404).send({ error: error.message });
+    }
+  });
+app.get('/todos',  async(req, res) => {
+    const todos = await Todo.find({});
+    res.json({success:true, todos})
 })
+app.delete("/delete", async (req, res) => {
+    const id = req.body.todoId;
+    try {
+      const todoData = await Todos.deleteOne({ _id: id });
+      return res.status(200).send(JSON.stringify(todoData));
+    } catch (error) {
+      console.log(error.message);
+      res.status(404).send({ error: error.message });
+    }
+  });
 
-app.listen(3000, () => console.log('Running on port 3000'))
+// app.listen(3000, () => console.log('Running on port 3000'))
 module.exports.handler = serverless(app)
