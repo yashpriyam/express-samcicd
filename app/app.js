@@ -23,19 +23,19 @@ app.get('/hell', (req, res) => res.send('Hello World'))
 app.post("/create", async (req, res) => {
     const todo = req.body.title;
     try {
-      const todoData = await Todos.create({ title: todo });
+      const todoData = await Todo.create({ title: todo });
       return res.status(200).send(JSON.stringify(todoData));
     } catch (error) {
       console.log(error.message);
       res.status(404).send({ error: error.message });
     }
   });
-  app.post("/update/:id", async (req, res) => {
+app.post("/update/:id", async (req, res) => {
     const id = req.params.id;
     try {
-      const todoData = await Todos.findOne({ _id: id });
+      const todoData = await Todo.findOne({ _id: id });
       const todoCompleted = todoData.completed ? false : true;
-      const updateTodo = await Todos.updateOne(
+      const updateTodo = await Todo.updateOne(
         { _id: id },
         {
           $set: {
@@ -56,12 +56,12 @@ app.get('/todos',  async(req, res) => {
 app.delete("/delete", async (req, res) => {
     const id = req.body.todoId;
     try {
-      const todoData = await Todos.deleteOne({ _id: id });
+      const todoData = await Todo.deleteOne({ _id: id });
       return res.status(200).send(JSON.stringify(todoData));
     } catch (error) {
       console.log(error.message);
       res.status(404).send({ error: error.message });
-    }
+    }   
   });
 
 // app.listen(3000, () => console.log('Running on port 3000'))
