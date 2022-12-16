@@ -2,15 +2,16 @@ const express = require('express')
 const serverless = require('serverless-http')
 // const Todo = require('./model/todo')
 const mongoose = require('mongoose')
+const cors = require('cors')
 
 const todoSchema = new mongoose.Schema({
     title: {type: String, required:true},
     completed: {type: Boolean, default: false},
 })
 
+// mongodb model and connect to database
 const Todo = mongoose.model('Todo', todoSchema);
 
-const app = express()
 const MONGODB_URI =
   "mongodb+srv://yash:yash12345@cluster0.firlmgw.mongodb.net/?retryWrites=true&w=majority";
 
@@ -23,6 +24,15 @@ async function connectDB() {
 }
 connectDB();
 
+const app = express()
+
+// middlewares
+app.use(cors({
+    origin: "https://master.d3l7aw6q5p47co.amplifyapp.com/"
+}))
+
+
+// todo routes
 
 app.get('/hell', (req, res) => res.send('Hello World'))
 app.post("/create", async (req, res) => {
