@@ -1,7 +1,14 @@
 const express = require('express')
 const serverless = require('serverless-http')
-const Todo = require('./model/todo')
+// const Todo = require('./model/todo')
 const mongoose = require('mongoose')
+
+const todoSchema = new mongoose.Schema({
+    title: {type: String, required:true},
+    completed: {type: Boolean, default: false},
+})
+
+const Todo = mongoose.model('Todo', todoSchema);
 
 const app = express()
 // Import the MongoDB driver
