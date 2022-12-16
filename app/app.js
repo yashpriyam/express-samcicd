@@ -11,21 +11,17 @@ const todoSchema = new mongoose.Schema({
 const Todo = mongoose.model('Todo', todoSchema);
 
 const app = express()
-// Import the MongoDB driver
-// Define our connection string. Info on where to get this will be described below. In a real world application you'd want to get this string from a key vault like AWS Key Management, but for brevity, we'll hardcode it in our serverless function here.
 const MONGODB_URI =
   "mongodb+srv://yash:yash12345@cluster0.firlmgw.mongodb.net/?retryWrites=true&w=majority";
 
 
-// async function connectDB() {
-//   const client = await mongoose.connect(`${MONGODB_URI}`, {
-//     useNewUrlParser: true,
-//     useUnifiedTopology: true,
-//   });
-//   // dbConnector = client.connections[0].db;
-//   // await addCsvDataToMongoAsJson(dbConnector);
-// }
-// connectDB();
+async function connectDB() {
+  const client = await mongoose.connect(`${MONGODB_URI}`, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  });
+}
+connectDB();
 
 
 app.get('/hell', (req, res) => res.send('Hello World'))
